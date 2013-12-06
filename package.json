@@ -1,8 +1,12 @@
 {
   "name": "html-parse-tree",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Create a parse tree from an HTML source",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kjbekkelund/html-parse-tree.git"
+  },
   "dependencies": {
     "htmlparser2": "~3.3.0"
   },
