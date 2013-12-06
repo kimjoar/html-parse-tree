@@ -1,5 +1,4 @@
 var htmlparser = require("htmlparser2");
-var fs = require("fs");
 
 module.exports = function(html, callback) {
     var blocks = [];
@@ -23,10 +22,6 @@ module.exports = function(html, callback) {
 
             currentBlock = tag;
         },
-        onopentagname: function(name) {
-            // console.log('name', name);
-        },
-        onattribute: function(name, value) {},
         ontext: function(text) {
             var tag = {
                 type: 'text',
@@ -71,13 +66,9 @@ module.exports = function(html, callback) {
                 blocks.push(tag);
             }
         },
-        oncommentend: function() {},
-        oncdatastart: function() {},
-        oncdataend: function() {},
         onerror: function(error) {
             callback(error);
         },
-        onreset: function() {},
         onend: function() {
             callback(null, blocks);
         }
