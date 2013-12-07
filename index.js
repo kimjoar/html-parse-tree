@@ -4,61 +4,53 @@ module.exports = function(html, callback) {
     var root = [];
     var tagstack = [];
 
+    function addElement(element) {
+        var parent = tagstack[tagstack.length - 1]
+        var siblings = parent ? parent.children : root;
+
+        element.parent = parent;
+        siblings.push(element);
+    }
+
     var parser = new htmlparser.Parser({
         onopentag: function(name, attrs) {
-            var parent = tagstack[tagstack.length - 1]
-
             var tag = {
                 type: 'tag',
                 name: name,
                 attrs: attrs,
-                parent: parent,
                 children: []
             };
 
-            if (!parent) root.push(tag);
-            else parent.children.push(tag);
-
+            addElement(tag);
             tagstack.push(tag);
         },
         ontext: function(text) {
-            var parent = tagstack[tagstack.length - 1]
-
             var tag = {
                 type: 'text',
-                parent: parent
+                data: text
             };
 
-            if (parent) parent.children.push(tag);
-            else root.push(tag);
+            addElement(tag);
         },
         onclosetag: function(name) {
             tagstack.pop();
         },
         onprocessinginstruction: function(name, data) {
-            var parent = tagstack[tagstack.length - 1]
-
             var tag = {
                 type: 'directive',
                 name: name,
-                data: data,
-                parent: parent
+                data: data
             };
 
-            if (parent) parent.children.push(tag);
-            else root.push(tag);
+            addElement(tag);
         },
         oncomment: function(data) {
-            var parent = tagstack[tagstack.length - 1]
-
             var tag = {
                 type: 'comment',
-                data: data,
-                parent: tagstack[tagstack.length - 1]
+                data: data
             };
 
-            if (parent) parent.children.push(tag);
-            else root.push(tag);
+            addElement(tag);
         },
         onerror: function(error) {
             callback(error);

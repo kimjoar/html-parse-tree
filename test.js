@@ -56,6 +56,7 @@ describe('html-parse-parse', function() {
             var h2 = tree[0].children[0];
             expect(h2).to.have.property('children');
             expect(h2.children).to.have.length(1);
+            expect(h2.children[0]).to.have.property('data', 'Heading');
         });
     });
 

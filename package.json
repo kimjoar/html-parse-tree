@@ -1,6 +1,6 @@
 {
   "name": "html-parse-tree",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Create a parse tree from an HTML source",
   "main": "index.js",
   "repository": {
