@@ -1,76 +1,70 @@
 var htmlparser = require("htmlparser2");
 
 module.exports = function(html, callback) {
-    var blocks = [];
-    var currentBlock = null;
+    var root = [];
+    var tagstack = [];
 
     var parser = new htmlparser.Parser({
         onopentag: function(name, attrs) {
+            var parent = tagstack[tagstack.length - 1]
+
             var tag = {
                 type: 'tag',
                 name: name,
                 attrs: attrs,
-                parent: currentBlock,
+                parent: parent,
                 children: []
             };
 
-            if (currentBlock) {
-                currentBlock.children.push(tag);
-            } else {
-                blocks.push(tag);
-            }
+            if (!parent) root.push(tag);
+            else parent.children.push(tag);
 
-            currentBlock = tag;
+            tagstack.push(tag);
         },
         ontext: function(text) {
+            var parent = tagstack[tagstack.length - 1]
+
             var tag = {
                 type: 'text',
-                parent: currentBlock
+                parent: parent
             };
 
-            if (currentBlock) {
-                currentBlock.children.push(tag);
-            } else {
-                blocks.push(tag);
-            }
+            if (parent) parent.children.push(tag);
+            else root.push(tag);
         },
         onclosetag: function(name) {
-            if (currentBlock) {
-                currentBlock = currentBlock.parent;
-            }
+            tagstack.pop();
         },
         onprocessinginstruction: function(name, data) {
+            var parent = tagstack[tagstack.length - 1]
+
             var tag = {
                 type: 'directive',
                 name: name,
                 data: data,
-                parent: currentBlock
+                parent: parent
             };
 
-            if (currentBlock) {
-                currentBlock.children.push(tag);
-            } else {
-                blocks.push(tag);
-            }
+            if (parent) parent.children.push(tag);
+            else root.push(tag);
         },
         oncomment: function(data) {
+            var parent = tagstack[tagstack.length - 1]
+
             var tag = {
                 type: 'comment',
                 data: data,
-                parent: currentBlock
+                parent: tagstack[tagstack.length - 1]
             };
 
-            if (currentBlock) {
-                currentBlock.children.push(tag);
-            } else {
-                blocks.push(tag);
-            }
+            if (parent) parent.children.push(tag);
+            else root.push(tag);
         },
         onerror: function(error) {
             callback(error);
         },
         onend: function() {
-            callback(null, blocks);
+            callback(null, root);
         }
     });
 
